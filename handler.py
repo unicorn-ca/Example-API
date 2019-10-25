@@ -8,7 +8,7 @@ def endpoint(event, context):
         'statusCode': 200,
         'body': json.dumps({
             'sentence': ''.join(reversed(s)),
-            'length': len(s),
+            'length': len(s)*len(s),
             'iteration': 5
         })
     }
