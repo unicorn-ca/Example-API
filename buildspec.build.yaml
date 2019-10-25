@@ -1,0 +1,76 @@
+#
+# Sample Buildspec file
+#
+# Deployment is done within ubuntu 18.04 docker image (i.e. aws/codebuild/standard:2.0 --> ubuntu/standard/2.0)
+# This should be a root user by default
+#
+# Please ensure that the buildspec does not conatin anything that waits on user input. E.g. use the -y flag
+# to ensure apt does not ask for confirmation
+#
+# More info here: https://docs.aws.amazon.com/codebuild/latest/userguide/build-spec-ref.html
+#
+
+# Please forgive all the sample- The base pipeline has those hardcoded. I'll fix those soon
+version: 0.2
+
+phases:
+    install:
+        runtime-versions:
+            nodejs: 10
+    pre_build:
+        commands:
+            - add-apt-repository ppa:rmescandon/yq
+            - apt update
+            - apt install -y yq
+            - npm install -g serverless
+            - npm install serverless-python-requirements
+    build:
+        commands:
+            # Some of the following few steps essentially replicate the behaviour of serverless
+            #  First we check that there isn't a deploymentBucket specified, if there is we error
+            #    otherwise we point it at the SAM bucket
+            #  Next we package the serverless app
+            #  We take the cloudformation-template-create-stack.json and deploy it - this should create an
+            #    empty bucket
+            #  Next we take the zip of the sourcecode and upload it to the bucket
+            #    Specifically we find file://<service.artifact> and copy it to s3://<bucket>/<package.artifactDirectoryName>/<package.artifact>
+            # This is pretty ugly, as it would require the user to have this for all their sls deployments.
+            #  Additionally it likely wouldn't scale very well for larger deployments.
+            #
+            #  Finding a better way of generically handling this (so its equally easy to deploy with serverless
+            #   vs SAM vs Raw Cloudformation) is a priority for the next iteration
+            #
+            - |
+              if [ `yq r serverless.yml provider.deploymentBucket.name` = 'null' ]; then
+                  echo "No deployment bucket found - using $SAM_BUCKET";
+                  yq w --inplace serverless.yml provider.deploymentBucket.name $SAM_BUCKET;
+              else
+                  echo 'Currently custom deployment buckets cannot be used';
+                  exit 1;
+              fi
+
+            - sls package
+            - |
+                UNI_LOCAL_ARTF=`jq -r .service.artifact .serverless/serverless-state.json`
+                UNI_S3_ARTF_DR=`jq -r .package.artifactDirectoryName .serverless/serverless-state.json`
+                UNI_S3_ARTF_NM=`jq -r .package.artifact .serverless/serverless-state.json`
+                aws s3 cp $UNI_LOCAL_ARTF s3://$SAM_BUCKET/$UNI_S3_ARTF_DR/$UNI_S3_ARTF_NM
+
+            - >-
+              echo '{"Parameters": {}}' > empty-configuration.json
+
+    post_build:
+        commands:
+            # These are required to be output for this iteration. I'll see if we can make these optional later.
+            - cp empty-configuration.json sample-configuration-dev.json
+            - cp empty-configuration.json sample-configuration-prod.json
+            # I don't know the difference between update-stack vs create-stack.json.
+            # update-stack seems more complete but idk how they're invoked. Not sure that sls package is
+            # the best solution either.
+            - mv .serverless/cloudformation-template-update-stack.json sample-transformed.yaml  
+
+artifacts:
+    files:
+        - sample-transformed.yaml
+        - sample-configuration-dev.json
+        - sample-configuration-prod.json

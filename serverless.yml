@@ -1,0 +1,20 @@
+service: lipsum
+provider:
+  name: aws
+  runtime: python3.7
+  stage: dev
+  region: ap-southeast-2
+  deploymentBucket:
+    name: magic
+plugins:
+- serverless-python-requirements
+package:
+  exclude:
+  - requirements.txt
+functions:
+  currentTime:
+    handler: handler.endpoint
+    events:
+    - http:
+        path: /
+        method: get
