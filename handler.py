@@ -7,7 +7,7 @@ def endpoint(event, context):
     return {
         'statusCode': 200,
         'body': json.dumps({
-            'sentence': s,
+            'sentence': ''.join(reversed(s)),
             'length': len(s),
             'iteration': 5
         })
