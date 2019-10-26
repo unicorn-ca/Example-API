@@ -26,16 +26,10 @@ phases:
             - npm install serverless-python-requirements
     build:
         commands:
-            # Some of the following few steps essentially replicate the behaviour of serverless
+            # We override servlerless's default functionality by pointing its deployment at a custom bucket embedded in
+            # the pipeline.
             #  First we check that there isn't a deploymentBucket specified, if there is we error
             #    otherwise we point it at the SAM bucket
-            #  Next we package the serverless app
-            #  We take the cloudformation-template-create-stack.json and deploy it - this should create an
-            #    empty bucket
-            #  Next we take the zip of the sourcecode and upload it to the bucket
-            #    Specifically we find file://<service.artifact> and copy it to s3://<bucket>/<package.artifactDirectoryName>/<package.artifact>
-            # This is pretty ugly, as it would require the user to have this for all their sls deployments.
-            #  Additionally it likely wouldn't scale very well for larger deployments.
             #
             #  Finding a better way of generically handling this (so its equally easy to deploy with serverless
             #   vs SAM vs Raw Cloudformation) is a priority for the next iteration
