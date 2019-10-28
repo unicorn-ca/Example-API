@@ -1,14 +1,64 @@
-import json
-import lorem
+import json, os
+import psycopg2
 
-def endpoint(event, context):
-    s = lorem.sentence()
+host = os.environ['HOST_NAME']
+database = os.environ['DB_NAME']
+user = os.environ['USERNAME']
+password = os.environ['PASSWORD']
+table = os.environ['TABLE_NAME']
+conn = psycopg2.connect(host=host, database=database, user=user, password=password)
 
-    return {
-        'statusCode': 200,
-        'body': json.dumps({
-            'sentence': ''.join(reversed(s)),
-            'length': len(s)*len(s),
-            'iteration': 7
-        })
+
+def vulnerable(event, context):
+    body = {}
+    if "queryStringParameters" in event:
+        vulnString = event["queryStringParameters"].get("vuln-string")
+        body["vulnString"] = vulnString
+        body["message"] = "Success"
+        query = "SELECT * FROM test"
+        # create a cursor
+        cur = conn.cursor()
+        # execute a statement
+        cur.execute("SELECT * FROM test WHERE username=%s" % vulnString)
+        # display the result
+        result = cur.fetchone()
+        # close the communication with the PostgreSQL
+        cur.close()
+        body["query"] = query
+        body["result"] = result
+    else:
+        body["message"] = "Please inject some SQL"
+        query = ""
+    response = {
+        "statusCode": 200,
+        "body": json.dumps(body)
     }
+    return response
+
+
+def secure(event, context):
+    body = {}
+    if "queryStringParameters" in event:
+        vulnString = event["queryStringParameters"].get("vuln-string")
+        body["vulnString"] = vulnString
+        body["message"] = "Success"
+        query = "SELECT * FROM test"
+        # create a cursor
+        cur = conn.cursor()
+        # execute a statement
+        cur.execute("SELECT * FROM test WHERE username=%s", (vulnString, ))
+        # display the result
+        result = cur.fetchone()
+        # close the communication with the PostgreSQL
+        cur.close()
+        body["query"] = query
+        body["result"] = result
+    else:
+        body["message"] = "Please inject some SQL"
+        query = ""
+    response = {
+        "statusCode": 200,
+        "body": json.dumps(body)
+    }
+    return response
+

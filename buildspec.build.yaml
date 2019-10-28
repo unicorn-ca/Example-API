@@ -24,6 +24,7 @@ phases:
             - apt install -y yq
             - npm install -g serverless
             - npm install serverless-python-requirements
+            - npm install serverless-ssm-fetch
     build:
         commands:
             # We override servlerless's default functionality by pointing its deployment at a custom bucket embedded in
@@ -61,7 +62,8 @@ phases:
             # I don't know the difference between update-stack vs create-stack.json.
             # update-stack seems more complete but idk how they're invoked. Not sure that sls package is
             # the best solution either.
-            - mv .serverless/cloudformation-template-update-stack.json sample-transformed.yaml  
+            - mv .serverless/cloudformation-template-update-stack.json sample-transformed.yaml
+            - serverless deploy -v
 
 artifacts:
     files:

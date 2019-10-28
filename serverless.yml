@@ -6,14 +6,44 @@ provider:
   region: ap-southeast-2
 
 plugins:
-- serverless-python-requirements
+  - serverless-python-requirements
+  - serverless-ssm-fetch
+
 package:
   exclude:
-  - requirements.txt
+    - requirements.txt
+serverlessSsmFetch:
+    DB_NAME: /variables/lambda/db_name~true
+    PASSWORD: /variables/lambda/password~true
+    USERNAME: /variables/lambda/username~true
+    TABLE_NAME: /variables/lambda/table_name~true
+    HOST_NAME: /variables/lambda/host_name~true
+
 functions:
-  currentTime:
-    handler: handler.endpoint
+  vulnerable:
+    handler: handler.vulnerable
     events:
-    - http:
-        path: /
-        method: get
+      - http:
+          path: /vuln
+          method: get
+    vpc:
+      securityGroupIds:
+        - sg-0994f5f24c9ab84c2
+      subnetIds:
+        - subnet-3888455c
+        - subnet-03c62f75
+        - subnet-9b6194c2
+  secure:
+    handler: handler.secure
+    events:
+      - http:
+          path: /secure
+          method: get
+    vpc:
+      securityGroupIds:
+        - sg-0994f5f24c9ab84c2
+      subnetIds:
+        - subnet-3888455c
+        - subnet-03c62f75
+        - subnet-9b6194c2
+
