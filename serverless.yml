@@ -12,7 +12,7 @@ plugins:
 package:
   exclude:
     - requirements.
-custome:
+custom:
   serverlessSsmFetch:
       DB_NAME: /variables/lambda/db_name~true
       PASSWORD: /variables/lambda/password~true
