@@ -25,6 +25,7 @@ phases:
             - npm install -g serverless
             - npm install serverless-python-requirements
             - npm install serverless-ssm-fetch
+            - npm install serverless-deployment-bucket --save-dev
     build:
         commands:
             # We override servlerless's default functionality by pointing its deployment at a custom bucket embedded in
