@@ -11,17 +11,24 @@ plugins:
 
 package:
   exclude:
-    - requirements.txt
-serverlessSsmFetch:
-    DB_NAME: /variables/lambda/db_name~true
-    PASSWORD: /variables/lambda/password~true
-    USERNAME: /variables/lambda/username~true
-    TABLE_NAME: /variables/lambda/table_name~true
-    HOST_NAME: /variables/lambda/host_name~true
+    - requirements.
+custome:
+  serverlessSsmFetch:
+      DB_NAME: /variables/lambda/db_name~true
+      PASSWORD: /variables/lambda/password~true
+      USERNAME: /variables/lambda/username~true
+      TABLE_NAME: /variables/lambda/table_name~true
+      HOST_NAME: /variables/lambda/host_name~true
 
 functions:
   vulnerable:
     handler: handler.vulnerable
+    ssmToEnvironment:
+      - DB_NAME
+      - PASSWORD
+      - USERNAME
+      - TABLE_NAME
+      - HOST_NAME
     events:
       - http:
           path: /vuln
@@ -35,6 +42,12 @@ functions:
         - subnet-9b6194c2
   secure:
     handler: handler.secure
+    ssmToEnvironment:
+      - DB_NAME
+      - PASSWORD
+      - USERNAME
+      - TABLE_NAME
+      - HOST_NAME
     events:
       - http:
           path: /secure
