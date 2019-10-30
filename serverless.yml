@@ -20,7 +20,6 @@ custom:
       DB_NAME: /variables/lambda/db_name~true
       PASSWORD: /variables/lambda/password~true
       USERNAME: /variables/lambda/username~true
-      TABLE_NAME: /variables/lambda/table_name~true
       HOST_NAME: /variables/lambda/host_name~true
 
 functions:
@@ -30,7 +29,6 @@ functions:
       - DB_NAME
       - PASSWORD
       - USERNAME
-      - TABLE_NAME
       - HOST_NAME
     events:
       - http:
@@ -38,18 +36,17 @@ functions:
           method: get
     vpc:
       securityGroupIds:
-        - sg-0994f5f24c9ab84c2
+        - sg-96ae5fe8
       subnetIds:
-        - subnet-3888455c
-        - subnet-03c62f75
-        - subnet-9b6194c2
+        - subnet-e769e1bf
+        - subnet-82b3b8cb
+        - subnet-4f140d28
   sqli_secure:
     handler: handler.sqli_secure
     ssmToEnvironment:
       - DB_NAME
       - PASSWORD
       - USERNAME
-      - TABLE_NAME
       - HOST_NAME
     events:
       - http:
@@ -57,8 +54,8 @@ functions:
           method: get
     vpc:
       securityGroupIds:
-        - sg-0994f5f24c9ab84c2
+        - sg-96ae5fe8
       subnetIds:
-        - subnet-3888455c
-        - subnet-03c62f75
-        - subnet-9b6194c2
+        - subnet-e769e1bf
+        - subnet-82b3b8cb
+        - subnet-4f140d28
