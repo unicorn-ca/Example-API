@@ -20,6 +20,7 @@ phases:
     pre_build:
         commands:
             - curl -L https://github.com/mikefarah/yq/releases/download/2.4.0/yq_linux_amd64 -o /bin/yq
+            - chmod +x /bin/yq
             - npm install -g serverless
             - npm install serverless-python-requirements
             - npm install serverless-ssm-fetch
