@@ -15,7 +15,7 @@ def sqli_vulnerable(event, context):
     if event["queryStringParameters"] is not None:
         vulnString = event["queryStringParameters"].get("vuln-string")
         
-        body["message"] = "Success"
+        body["result"] = "Success"
         body["vulnString"] = vulnString
         
         query = "SELECT * FROM test WHERE username=%s" % vulnString
@@ -35,7 +35,7 @@ def sqli_vulnerable(event, context):
         body["query"] = query
         body["result"] = result
     else:
-        body["message"] = "Please inject some SQL with ?vuln-string="
+        body["result"] = "Please inject some SQL with ?vuln-string="
     
     response = {
         "statusCode": 200,
@@ -51,7 +51,7 @@ def sqli_secure(event, context):
     if event["queryStringParameters"] is not None:
         vulnString = event["queryStringParameters"].get("vuln-string")
         
-        body["message"] = "Success"
+        body["result"] = "Success"
         body["vulnString"] = vulnString
         
         query = "SELECT * FROM test WHERE username=%s" % vulnString
@@ -71,7 +71,7 @@ def sqli_secure(event, context):
         body["query"] = query
         body["result"] = result
     else:
-        body["message"] = "Please inject some SQL with ?vuln-string="
+        body["result"] = "Please inject some SQL with ?vuln-string="
 
     response = {
         "statusCode": 200,
