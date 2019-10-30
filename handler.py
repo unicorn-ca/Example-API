@@ -1,4 +1,4 @@
-# Deploy magic: 8
+# Deploy magic: 9
 import json, os
 import psycopg2
 
