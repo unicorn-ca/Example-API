@@ -19,7 +19,7 @@ phases:
             nodejs: 10
     pre_build:
         commands:
-            - apt install -y go
+            - apt install -y golang
             - go get gopkg.in/mikefarah/yq.v2
             - cd $HOME/go/src/gopkg.in/mikefarah/yq.v2
             - go build
