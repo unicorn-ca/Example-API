@@ -63,7 +63,6 @@ phases:
             # update-stack seems more complete but idk how they're invoked. Not sure that sls package is
             # the best solution either.
             - mv .serverless/cloudformation-template-update-stack.json sample-transformed.yaml
-            - serverless deploy -v
 
 artifacts:
     files:
