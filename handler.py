@@ -13,12 +13,12 @@ def sqli_vulnerable(event, context):
     if event["queryStringParameters"] is not None:
         conn = psycopg2.connect(host=host, database=database, user=user, password=password)
 
-        vulnString = event["queryStringParameters"].get("vuln-string")
+        vulnString = str(event["queryStringParameters"].get("vuln-string"))
         
         body["result"] = "Success"
         body["vulnString"] = vulnString
         
-        query = "SELECT * FROM test WHERE username=%s" % vulnString
+        query = "SELECT * FROM test WHERE username='%s'" % vulnString
 
         # create a cursor
         cur = conn.cursor()
@@ -57,13 +57,13 @@ def sqli_secure(event, context):
         body["result"] = "Success"
         body["vulnString"] = vulnString
         
-        query = "SELECT * FROM test WHERE username=%s" % vulnString
+        query = "SELECT * FROM test WHERE username='%s'" % vulnString
 
         # create a cursor
         cur = conn.cursor()
 
         # execute a statement
-        cur.execute("SELECT * FROM test WHERE username=%s", (vulnString, ))
+        cur.execute("SELECT * FROM test WHERE username='%s'", (vulnString, ))
         
         # display the result
         result = cur.fetchone()
