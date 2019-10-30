@@ -7,12 +7,12 @@ database = os.environ['DB_NAME']
 user     = os.environ['USERNAME']
 password = os.environ['PASSWORD']
 
-conn = psycopg2.connect(host=host, database=database, user=user, password=password)
-
 def sqli_vulnerable(event, context):
     body = {}
 
     if event["queryStringParameters"] is not None:
+        conn = psycopg2.connect(host=host, database=database, user=user, password=password)
+
         vulnString = event["queryStringParameters"].get("vuln-string")
         
         body["result"] = "Success"
@@ -34,6 +34,8 @@ def sqli_vulnerable(event, context):
 
         body["query"] = query
         body["result"] = result
+
+        conn.close()
     else:
         body["result"] = "Please inject some SQL with ?vuln-string="
     
@@ -49,6 +51,7 @@ def sqli_secure(event, context):
     body = {}
 
     if event["queryStringParameters"] is not None:
+        conn = psycopg2.connect(host=host, database=database, user=user, password=password)
         vulnString = event["queryStringParameters"].get("vuln-string")
         
         body["result"] = "Success"
@@ -70,6 +73,7 @@ def sqli_secure(event, context):
         
         body["query"] = query
         body["result"] = result
+        conn.close()
     else:
         body["result"] = "Please inject some SQL with ?vuln-string="
 
