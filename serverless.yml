@@ -1,4 +1,6 @@
-service: lipsum
+org: jamamalade
+app: unicorn
+service: example
 
 provider:
   name: aws
@@ -8,54 +10,16 @@ provider:
 
 plugins:
   - serverless-python-requirements
-  - serverless-ssm-fetch
 package:
   exclude:
     - requirements.txt
     - README.md
     - .gitignore
 
-custom:
-  serverlessSsmFetch:
-      DB_NAME: /variables/lambda/db_name~true
-      PASSWORD: /variables/lambda/password~true
-      USERNAME: /variables/lambda/username~true
-      HOST_NAME: /variables/lambda/host_name~true
-
 functions:
   sqli_vulnerable:
-    handler: handler.sqli_vulnerable
-    ssmToEnvironment:
-      - DB_NAME
-      - PASSWORD
-      - USERNAME
-      - HOST_NAME
+    handler: handler.xss_vulnerable
     events:
       - http:
-          path: /sqli_vuln
-          method: get
-    vpc:
-      securityGroupIds:
-        - sg-96ae5fe8
-      subnetIds:
-        - subnet-e769e1bf
-        - subnet-82b3b8cb
-        - subnet-4f140d28
-  sqli_secure:
-    handler: handler.sqli_secure
-    ssmToEnvironment:
-      - DB_NAME
-      - PASSWORD
-      - USERNAME
-      - HOST_NAME
-    events:
-      - http:
-          path: /sqli_secure
-          method: get
-    vpc:
-      securityGroupIds:
-        - sg-96ae5fe8
-      subnetIds:
-        - subnet-e769e1bf
-        - subnet-82b3b8cb
-        - subnet-4f140d28
+          path: /xss_vuln
+          method: post

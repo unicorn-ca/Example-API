@@ -1,118 +1,27 @@
 import json, os
-import psycopg2
+import html
 
-host     = os.environ['HOST_NAME']
-database = os.environ['DB_NAME']
-user     = os.environ['USERNAME']
-password = os.environ['PASSWORD']
-
-conn = psycopg2.connect(host=host, database=database, user=user, password=password)
-
-def sqli_vulnerable(event, context):
-    body = {}
-
-    if event["queryStringParameters"] is not None:
-        vulnString = event["queryStringParameters"].get("vuln-string")
-        
-        body["message"] = "Success"
-        body["vulnString"] = vulnString
-        
-        query = "SELECT * FROM test WHERE username=%s" % vulnString
-
-        # create a cursor
-        cur = conn.cursor()
-
-        # execute a statement
-        cur.execute(query)
-
-        # display the result
-        result = cur.fetchone()
-
-        # close the communication with the PostgreSQL
-        cur.close()
-
-        body["query"] = query
-        body["result"] = result
-    else:
-        body["message"] = "Please inject some SQL with ?vuln-string="
-    
-    response = {
-        "statusCode": 200,
-        "body": json.dumps(body)
-    }
-    
-    return response
-
-
-def sqli_secure(event, context):
-    body = {}
-
-    if event["queryStringParameters"] is not None:
-        vulnString = event["queryStringParameters"].get("vuln-string")
-        
-        body["message"] = "Success"
-        body["vulnString"] = vulnString
-        
-        query = "SELECT * FROM test WHERE username=%s" % vulnString
-
-        # create a cursor
-        cur = conn.cursor()
-
-        # execute a statement
-        cur.execute("SELECT * FROM test WHERE username=%s", (vulnString, ))
-        
-        # display the result
-        result = cur.fetchone()
-        
-        # close the communication with the PostgreSQL
-        cur.close()
-        
-        body["query"] = query
-        body["result"] = result
-    else:
-        body["message"] = "Please inject some SQL with ?vuln-string="
-
-    response = {
-        "statusCode": 200,
-        "body": json.dumps(body)
-    }
-
-    return response
-
-"""
 def xss_vulnerable(event, context):
     body = {}
 
-    if event["queryStringParameters"] is not None:
-        vulnString = event["queryStringParameters"].get("vuln-string")
+    if event["body"] is not None and event["body"] is not None:
         
-        body["message"] = "Success"
-        body["vulnString"] = vulnString
-        
-        query = "SELECT * FROM test WHERE username=%s" % vulnString
 
-        # create a cursor
-        cur = conn.cursor()
+        username = event["body"]["username"]
+        password = html.escape(event["body"]["password"])
 
-        # execute a statement
-        cur.execute("SELECT * FROM test WHERE username=%s", (vulnString, ))
-        
-        # display the result
-        result = cur.fetchone()
-        
-        # close the communication with the PostgreSQL
-        cur.close()
-        
-        body["query"] = query
-        body["result"] = result
+        # Lets pretend a silly business is emailing their clients
+        # their usernames and passwords for 'safe' keeping, after
+        # they have signed up to the businesses service.
+        # The api return may look something like this, afterwhich the
+        # username and password can be formatted into an email 
+        body["body"] = username + password
     else:
-        body["message"] = "Please inject some SQL with ?vuln-string="
+        body["message"] = "No username or password POSTed"
 
     response = {
         "statusCode": 200,
-        "body": json.dumps(body)
+        "body": json.dumps(event)
     }
-
+    
     return response
-
-"""

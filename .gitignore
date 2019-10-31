@@ -246,3 +246,9 @@ tags
 [._]*.un~
 
 # End of https://www.gitignore.io/api/git,vim,node,python,serverless,code
+
+
+# Don't include Jamal's virtualenv and vscode
+venv
+.vscode
+package-lock.json
