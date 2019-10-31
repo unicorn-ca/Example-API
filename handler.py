@@ -27,7 +27,7 @@ def sqli_vulnerable(event, context):
         cur.execute(query)
 
         # display the result
-        result = cur.fetchone()
+        result = cur.fetchall()
 
         # close the communication with the PostgreSQL
         cur.close()
@@ -66,7 +66,7 @@ def sqli_secure(event, context):
         cur.execute("SELECT * FROM test WHERE username='%s'", (vulnString, ))
         
         # display the result
-        result = cur.fetchone()
+        result = cur.fetchall()
         
         # close the communication with the PostgreSQL
         cur.close()
