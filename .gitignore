@@ -111,6 +111,9 @@ public/
 # Serverless directories
 .serverless/
 
+# Pycharm .idea directories
+.idea/
+
 # FuseBox cache
 .fusebox/
 
