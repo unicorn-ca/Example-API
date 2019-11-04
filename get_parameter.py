@@ -1,6 +1,5 @@
 import json
 import boto3
-import logging
 import traceback
 from botocore.vendored import requests
 
@@ -38,7 +37,7 @@ def handler(event, context):
              noEcho=True)  # Need to remove sensitive data from logs
 
     except Exception as e:
-        logging.error(traceback.format_exc())
+        print(traceback.format_exc(), e)
         responseData = {}
         responseData[
             'Error'] = "Lambda Function was unable to successfully retrieve the password from the SSM parameter"

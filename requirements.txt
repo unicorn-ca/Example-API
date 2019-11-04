@@ -1,6 +1,2 @@
 psycopg2-binary
-json
-logging
-traceback
 boto3
-botocore
