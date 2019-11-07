@@ -66,3 +66,16 @@ functions:
         - subnet-e769e1bf
         - subnet-82b3b8cb
         - subnet-4f140d28
+  jwt_insecure:
+    handler: handler.jwt_insecure
+    events:
+      - http:
+          path: /jwt_insecure
+          method: get
+    vpc:
+      securityGroupIds:
+        - sg-96ae5fe8
+      subnetIds:
+        - subnet-e769e1bf
+        - subnet-82b3b8cb
+        - subnet-4f140d28
