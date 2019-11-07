@@ -136,7 +136,7 @@ def do_jwt(event, context, myjwt_encode, myjwt_decode):
         if 'token' not in get_params:
             return ret(401, 'Please request a token from ?action=new first')
         jwt = myjwt_decode(get_params['token'])
-        if jwt is None: ret(400, 'Invalid jwt')
+        if jwt is None: return ret(400, 'Invalid jwt')
 
         if jwt['admin'] != 1:
             return ret(403, 'You are not admin. Go away!')
