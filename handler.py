@@ -1,6 +1,7 @@
 # Deploy magic: 7
 import json, os
 import psycopg2
+import jwt
 
 host = os.environ['HOST_NAME']
 database = os.environ['DB_NAME']
@@ -84,3 +85,51 @@ def sqli_secure(event, context):
     }
 
     return response
+
+def myjwt_encode(data):
+    return jwt.encode(data, password, algorithm='HS256')
+
+def myjwt_decode(data):
+    try:
+        alg = json.loads(base64.b64decode(data.split('.')[0].encode()).decode())['alg']
+    except:
+        return None
+
+    return jwt.decode(data, password, algorithms=['HS256'], verify=(alg != "none"))
+
+def jwt_insecure(event, context):
+    ret = lambda code, msg: {'statusCode': code, 'body': json.dumps({'result': msg})}
+    get_params = event['queryStringParameters']
+
+    if get_params is None or 'action' not in get_params:
+        return ret(400, 'Please specify an action using ?action=')
+
+    if get_params['action'] == 'new':
+        jwt = myjwt_encode({'admin': 0})
+        return ret(200, jwt)
+    elif get_params['action'] == 'public':
+        if 'token' not in get_params:
+            return ret(401, 'Please request a token from ?action=new first')
+        else:
+            jwt = myjwt_decode(get_params['token'])
+            return (
+                ret(400, 'Invalid jwt') if jwt is None else
+                ret(200, f'Hello {"admin" if jwt["admin"] == 1 else "user"}!')
+            )
+    elif get_params['action'] == 'secret':
+        if 'token' not in get_params:
+            return ret(401, 'Please request a token from ?action=new first')
+        jwt = myjwt_decode(get_params['token'])
+        if jwt is None: ret(400, 'Invalid jwt')
+
+        if jwt['admin'] != 1:
+            return ret(403, 'You are not admin. Go away!')
+        else:
+            return ret(200, 'Hi admin! The secret is "password" (jk its not actually)')
+    else:
+        return ret(404, f'Unknown action {get_params["action"]}')
+
+
+
+
+
