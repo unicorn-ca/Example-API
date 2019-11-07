@@ -66,3 +66,29 @@ functions:
         - subnet-e769e1bf
         - subnet-82b3b8cb
         - subnet-4f140d28
+  command_injection_vulnerable:
+    handler: handler.command_injection_vulnerable
+    events:
+      - http:
+          path: /command_injection_vulnerable
+          method: get
+    vpc:
+      securityGroupIds:
+        - sg-96ae5fe8
+      subnetIds:
+        - subnet-e769e1bf
+        - subnet-82b3b8cb
+        - subnet-4f140d28
+  command_injection_secure:
+    handler: handler.command_injection_secure
+    events:
+      - http:
+          path: /command_injection_secure
+          method: get
+    vpc:
+      securityGroupIds:
+        - sg-96ae5fe8
+      subnetIds:
+        - subnet-e769e1bf
+        - subnet-82b3b8cb
+        - subnet-4f140d28

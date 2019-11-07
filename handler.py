@@ -84,3 +84,57 @@ def sqli_secure(event, context):
     }
 
     return response
+
+def command_injection_vulnerable(event, context):
+    body = {}
+
+    if event["queryStringParameters"] is not None:
+        
+
+        vulnString = str(event["queryStringParameters"].get("vuln-string"))
+
+        body["result"] = "Success"
+        body["vulnString"] = vulnString
+
+        command = "ls -l %s" % vulnString
+
+        result = subprocess.getoutput(command)
+
+        body["command"] = command
+        body["result"] = result
+    else:
+        body["result"] = "Please inject a command with ?vuln-string="
+
+    response = {
+        "statusCode": 200,
+        "body": json.dumps(body)
+    }
+
+    return response
+
+def command_injection_secure(event, context):
+    body = {}
+
+    if event["queryStringParameters"] is not None:
+        
+
+        vulnString = str(event["queryStringParameters"].get("vuln-string"))
+
+        body["result"] = "Success"
+        body["vulnString"] = vulnString
+
+        command = "ls -l %s" % vulnString
+
+        result = subprocess.run(command.split(" "), stdout=subprocess.PIPE).stdout.decode('utf-8')
+
+        body["command"] = command
+        body["result"] = result
+    else:
+        body["result"] = "Please inject a command with ?vuln-string="
+
+    response = {
+        "statusCode": 200,
+        "body": json.dumps(body)
+    }
+
+    return response
