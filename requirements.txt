@@ -1,4 +1,3 @@
-psycopg2-binary
 boto3boto3==1.10.12
 botocore==1.13.12
 docutils==0.15.2
