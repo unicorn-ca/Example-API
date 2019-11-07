@@ -101,7 +101,19 @@ def myjwt_decode(data):
 
     return jwt.decode(data, password, algorithms=['HS256'], verify=(alg != "none"))
 
+def myjwt_decode_secure(data):
+    try:
+        return jwt.decode(data, password, algorithms=['HS256'])
+    except:
+        return None
+
 def jwt_insecure(event, context):
+    return do_jwt(event, context, myjwt_encode, myjwt_decode)
+
+def jwt_secure(event, context):
+    return do_jwt(event, context, myjwt_encode, myjwt_decode_secure)
+
+def do_jwt(event, context, myjwt_encode, myjwt_decode):
     ret = lambda code, msg: {'statusCode': code, 'body': json.dumps({'result': msg})}
     get_params = event['queryStringParameters']
 
@@ -132,8 +144,5 @@ def jwt_insecure(event, context):
             return ret(200, 'Hi admin! The secret is "password" (jk its not actually)')
     else:
         return ret(404, f'Unknown action {get_params["action"]}')
-
-
-
 
 
