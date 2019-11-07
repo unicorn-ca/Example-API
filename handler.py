@@ -2,11 +2,13 @@
 import json, os
 import psycopg2
 import jwt
+import base64
 
-host = os.environ['HOST_NAME']
-database = os.environ['DB_NAME']
-user = os.environ['USERNAME']
-password = os.environ['PASSWORD']
+if 'HOST_NAME' in os.environ:
+    host = os.environ['HOST_NAME']
+    database = os.environ['DB_NAME']
+    user = os.environ['USERNAME']
+    password = os.environ['PASSWORD']
 
 
 def sqli_vulnerable(event, context):
@@ -91,7 +93,9 @@ def myjwt_encode(data):
 
 def myjwt_decode(data):
     try:
-        alg = json.loads(base64.b64decode(data.split('.')[0].encode()).decode())['alg']
+        header = data.split('.')[0]
+        header += '=' * (-len(header) % 4)
+        alg = json.loads(base64.b64decode(header).decode())['alg']
     except:
         return None
 
@@ -105,7 +109,7 @@ def jwt_insecure(event, context):
         return ret(400, 'Please specify an action using ?action=')
 
     if get_params['action'] == 'new':
-        jwt = myjwt_encode({'admin': 0})
+        jwt = myjwt_encode({'admin': 0}).decode()
         return ret(200, jwt)
     elif get_params['action'] == 'public':
         if 'token' not in get_params:
