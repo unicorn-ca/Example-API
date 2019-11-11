@@ -50,6 +50,7 @@ phases:
                 UNI_S3_ARTF_DR=`jq -r .package.artifactDirectoryName .serverless/serverless-state.json`
                 UNI_S3_ARTF_NM=`jq -r .package.artifact .serverless/serverless-state.json`
                 aws s3 cp $UNI_LOCAL_ARTF s3://$SAM_BUCKET/$UNI_S3_ARTF_DR/$UNI_S3_ARTF_NM
+                aws ssm put-parameter --name /variables/lambda/s3_bucket --value s3://$SAM_BUCKET/$UNI_S3_ARTF_DR/$UNI_S3_ARTF_NM --type "SecureString" --overwrite
 
             - >-
               echo '{"Parameters": {}}' > empty-configuration.json
