@@ -114,6 +114,8 @@ public/
 # Pycharm .idea directories
 .idea/
 
+.DS_Store
+
 # FuseBox cache
 .fusebox/
 
