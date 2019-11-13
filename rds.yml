@@ -171,7 +171,7 @@ Resources:
       FunctionName: GetUsernameLambda
       CodeUri:
         Bucket: 'unicorn-dev-serverlessdeploymentbucket-o8itbahb88yw'
-        Key: 'serverless/unicorn/dev/1572903642540-2019-11-04T21:40:42.540Z/unicorn2.zip'
+        Key: 'serverless/unicorn/dev/1572903642540-2019-11-04T21:40:42.540Z/unicorn.zip'
       Handler: get_parameter.handler
       MemorySize: 128 # Minimum allowed value. No reason for this lambda function to use more than 128MB.
       Role: !GetAtt LambdaExecutionRole.Arn
