@@ -112,7 +112,7 @@ Resources:
         Ref: DBEngine
       EngineVersion:
         Ref: DBEngineVersion
-      MasterUsername: !GetAtt InvokeGetMasterUsernameLambda.Data
+      MasterUsername: "abcd"
       MasterUserPassword: '{{resolve:ssm-secure:/variables/lambda/password:1}}'
       PubliclyAccessible: True
       Tags:
@@ -122,70 +122,70 @@ Resources:
       DBSubnetGroupName:
         Ref: DBSubnetGroup
 
-  LambdaExecutionRole:
-    Type: "AWS::IAM::Role"
-    Properties:
-      AssumeRolePolicyDocument:
-        Version: "2012-10-17"
-        Statement:
-          -
-            Effect: "Allow"
-            Principal:
-              Service:
-                - "lambda.amazonaws.com"
-            Action:
-              - "sts:AssumeRole"
-      ManagedPolicyArns:
-        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
-      Path: "/"
-      Policies:
-        -
-          PolicyName: "SSM-Parameter-Access"
-          PolicyDocument:
-            Version: "2012-10-17"
-            Statement:
-              -
-                Effect: "Allow"
-                Action:
-                  - ssm:GetParameters
-                  - ssm:GetParameter
-                  - ssm:PutParameter
-                Resource: !Sub 'arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/variables/lambda*'
-        -
-          PolicyName: "S3-Bucket-access"
-          PolicyDocument:
-            Version: "2012-10-17"
-            Statement:
-              -
-                Effect: "Allow"
-                Action:
-                  - s3:Get*
-                  - s3:List*
-                Resource: 'arn:aws:s3:::*'
-      RoleName: !Ref IAMRoleName
-
-  GetMasterUsernameLambda:
-    Type: AWS::Serverless::Function
-    Properties:
-      Description: Lambda Function that will retrieve password from encrypted SSM parameter.
-      FunctionName: GetUsernameLambda
-      CodeUri:
-        Bucket: 'unicorn-dev-serverlessdeploymentbucket-o8itbahb88yw'
-        Key: 'serverless/unicorn/dev/1572903642540-2019-11-04T21:40:42.540Z/unicorn2.zip'
-      Handler: get_parameter.handler
-      MemorySize: 128 # Minimum allowed value. No reason for this lambda function to use more than 128MB.
-      Role: !GetAtt LambdaExecutionRole.Arn
-      Runtime: python3.7
-      Timeout: 10
-
-  InvokeGetMasterUsernameLambda:
-    Type: AWS::CloudFormation::CustomResource
-    DeletionPolicy: Retain
-    Version: "1.0"
-    Properties:
-      ServiceToken: !GetAtt GetMasterUsernameLambda.Arn
-      ParameterName:
-        Ref: SSMUsername
+#  LambdaExecutionRole:
+#    Type: "AWS::IAM::Role"
+#    Properties:
+#      AssumeRolePolicyDocument:
+#        Version: "2012-10-17"
+#        Statement:
+#          -
+#            Effect: "Allow"
+#            Principal:
+#              Service:
+#                - "lambda.amazonaws.com"
+#            Action:
+#              - "sts:AssumeRole"
+#      ManagedPolicyArns:
+#        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+#      Path: "/"
+#      Policies:
+#        -
+#          PolicyName: "SSM-Parameter-Access"
+#          PolicyDocument:
+#            Version: "2012-10-17"
+#            Statement:
+#              -
+#                Effect: "Allow"
+#                Action:
+#                  - ssm:GetParameters
+#                  - ssm:GetParameter
+#                  - ssm:PutParameter
+#                Resource: !Sub 'arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/variables/lambda*'
+#        -
+#          PolicyName: "S3-Bucket-access"
+#          PolicyDocument:
+#            Version: "2012-10-17"
+#            Statement:
+#              -
+#                Effect: "Allow"
+#                Action:
+#                  - s3:Get*
+#                  - s3:List*
+#                Resource: 'arn:aws:s3:::*'
+#      RoleName: !Ref IAMRoleName
+#
+#  GetMasterUsernameLambda:
+#    Type: AWS::Serverless::Function
+#    Properties:
+#      Description: Lambda Function that will retrieve password from encrypted SSM parameter.
+#      FunctionName: GetUsernameLambda
+#      CodeUri:
+#        Bucket: 'unicorn-dev-serverlessdeploymentbucket-o8itbahb88yw'
+#        Key: 'serverless/unicorn/dev/1572903642540-2019-11-04T21:40:42.540Z/unicorn2.zip'
+#      Handler: get_parameter.handler
+#      MemorySize: 128 # Minimum allowed value. No reason for this lambda function to use more than 128MB.
+#      Role: !GetAtt LambdaExecutionRole.Arn
+#      Runtime: python3.7
+#      Timeout: 10
+#
+#  InvokeGetMasterUsernameLambda:
+#    Type: AWS::CloudFormation::CustomResource
+#    DeletionPolicy: Retain
+#    Version: "1.0"
+#    Properties:
+#      ServiceToken: !GetAtt GetMasterUsernameLambda.Arn
+#      ParameterName:
+#        Ref: SSMUsername
 
 Outputs:
   EndpointMaster:
