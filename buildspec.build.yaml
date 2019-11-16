@@ -46,11 +46,9 @@ phases:
               fi
               PASSWORD="$(python -c 'import uuid; print(uuid.uuid4().hex)')"
               USERNAME="$(python -c 'import uuid, string, random; a=random.choice(string.ascii_letters)+uuid.uuid4().hex; print(a[0:15])')"
-              IDENTIFIER="$(python -c 'import uuid, string, random; a=random.choice(string.ascii_letters)+uuid.uuid4().hex; print(a[0:10])')"
 
               aws ssm put-parameter --name "/variables/lambda/username" --value "$USERNAME" --type "SecureString" --overwrite
               aws ssm put-parameter --name "/variables/lambda/password" --value "$PASSWORD" --type "SecureString" --overwrite
-              aws ssm put-parameter --name "/variables/lambda/identifier" --value "$IDENTIFIER" --type "SecureString" --overwrite
 
             - sls package
             - |
@@ -62,7 +60,7 @@ phases:
                 aws s3 cp $UNI_LOCAL_ARTF $S3_BUCKET
                 aws ssm put-parameter --name "/variables/lambda/s3_bucket" --value "$S3_BUCKET" --type "SecureString" --overwrite
 
-                echo "{\"Parameters\": { \"Password\": \"${PASSWORD}\", \"Username\": \"${USERNAME}\", \"Identifier\": \"${IDENTIFIER}\"}}" > rds-config.json
+                echo "{\"Parameters\": { \"Password\": \"${PASSWORD}\", \"Username\": \"${USERNAME}\"}}" > rds-config.json
                 cat rds-config.json
 
             - >-

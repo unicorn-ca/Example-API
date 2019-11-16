@@ -107,7 +107,7 @@ Resources:
   DemoMasterInstance:
     Type: AWS::RDS::DBInstance
     Properties:
-      DBInstanceIdentifier: !Ref Identifier
+      DBInstanceIdentifier: 'demo-db'
       DBName: "vulndb"
       AllocatedStorage:
         Ref: DBAllocatedStorage
