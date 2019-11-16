@@ -53,7 +53,7 @@ phases:
                 aws configure set cli_follow_urlparam false
                 aws s3 cp $UNI_LOCAL_ARTF $S3_BUCKET
                 aws ssm put-parameter --name "/variables/lambda/s3_bucket" --value "$S3_BUCKET" --type "SecureString" --overwrite
-                echo "{\"Parameters\": { \"ParameterKey\": \"ReadCapacity\", \"ParameterValue\": \"${S3_BUCKET}\"}" > rds-config.json
+                echo "{\"Parameters\": { \"ParameterKey\": \"BucketName\", \"ParameterValue\": \"${S3_BUCKET}\"}" > rds-config.json
                 cat rds-config.json
 #                jq '.Parameters.BucketName = "s3://unicorn-tooling-accountstack-s9ru91vs16-sambucket-1kz63znob46ht/serverless/unicorn/dev/1573881182815-2019-11-16T05:13:02.815Z/unicorn.zip"' rds-config.json > abc.json && mv abc.json rds-config.json
 #                rm abc.json
