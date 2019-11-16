@@ -23,6 +23,7 @@ def setup_mock_data():
 
     body["result"] = "Success"
     query = "CREATE TABLE IF NOT EXISTS test (username text PRIMARY KEY)"
+    delete_query = "DELETE FROM test WHERE table.id = (SELECT id FROM another_table)"
     # create a cursor
     cur = conn.cursor()
 

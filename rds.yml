@@ -107,8 +107,8 @@ Resources:
   DemoMasterInstance:
     Type: AWS::RDS::DBInstance
     Properties:
-      DBInstanceIdentifier: 'demo-db'
-      DBName: "vulndb"
+      DBInstanceIdentifier: '{{resolve:ssm-secure:/variables/lambda/identifier:1}}'
+      DBName: "{{resolve:ssm-secure:/variables/lambda/db_name:1}}"
       AllocatedStorage:
         Ref: DBAllocatedStorage
       DBInstanceClass:
