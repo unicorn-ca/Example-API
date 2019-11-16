@@ -107,8 +107,8 @@ Resources:
   DemoMasterInstance:
     Type: AWS::RDS::DBInstance
     Properties:
-      DBInstanceIdentifier: '{{resolve:ssm-secure:/variables/lambda/identifier:1}}'
-      DBName: "{{resolve:ssm-secure:/variables/lambda/db_name:1}}"
+      DBInstanceIdentifier: 'demo-db'
+      DBName: "postgres"
       AllocatedStorage:
         Ref: DBAllocatedStorage
       DBInstanceClass:
