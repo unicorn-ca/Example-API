@@ -42,6 +42,10 @@ Parameters:
   ReplicaInstanceIdentifier:
     Type: String
     Default: "demo-replica"
+  BucketName:
+    Description: S3 bucket name for Lambda code
+    Type: String
+    Default: 'bucket'
   DBEngine:
     Type: String
     Default: "postgres"
@@ -169,9 +173,7 @@ Resources:
     Properties:
       Description: Lambda Function that will retrieve password from encrypted SSM parameter.
       FunctionName: GetUsernameLambda
-      CodeUri:
-        Bucket: 'unicorn-dev-serverlessdeploymentbucket-o8itbahb88yw'
-        Key: 'serverless/unicorn/dev/1572903642540-2019-11-04T21:40:42.540Z/unicorn.zip'
+      CodeUri: !Ref BucketName
       Handler: get_parameter.handler
       MemorySize: 128 # Minimum allowed value. No reason for this lambda function to use more than 128MB.
       Role: !GetAtt LambdaExecutionRole.Arn

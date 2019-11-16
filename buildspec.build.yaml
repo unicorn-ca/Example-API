@@ -56,12 +56,16 @@ phases:
 
             - >-
               echo '{"Parameters": {}}' > empty-configuration.json
+              echo '{"Parameters": { "S3_BUCKET": ""}}' > rds-config.json
+              jq --arg S3_BUCKET $S3_BUCKET '.Parameters.BucketName = $S3_BUCKET' rds-config.json > abc.json && mv abc.json rds-config.json
+              rm abc.json
 
     post_build:
         commands:
             # These are required to be output for this iteration. I'll see if we can make these optional later.
             - cp empty-configuration.json sample-configuration-dev.json
             - cp empty-configuration.json sample-configuration-prod.json
+            - cp rds-config.json sample-configuration-rds.json
             # I don't know the difference between update-stack vs create-stack.json.
             # update-stack seems more complete but idk how they're invoked. Not sure that sls package is
             # the best solution either.
@@ -72,3 +76,5 @@ artifacts:
         - sample-transformed.yaml
         - sample-configuration-dev.json
         - sample-configuration-prod.json
+        - sample-configuration-rds.json
+        - rds.yml
