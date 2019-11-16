@@ -47,7 +47,7 @@ Parameters:
     Default: "postgres"
   DBName:
     Type: String
-    Default: "abcd"
+    Default: "postgres"
   DBEngineVersion:
     Type: String
     Default: "11.5"
