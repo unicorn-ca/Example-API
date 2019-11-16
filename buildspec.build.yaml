@@ -62,12 +62,8 @@ phases:
                 aws s3 cp $UNI_LOCAL_ARTF $S3_BUCKET
                 aws ssm put-parameter --name "/variables/lambda/s3_bucket" --value "$S3_BUCKET" --type "SecureString" --overwrite
 
-                echo "{\"Parameters\": { \"Password"\: \"${PASSWORD}\", \"Username"\: \"${USERNAME}\", \"Identifier"\: \"${IDENTIFIER}\"}}" > rds-config.json
+                echo "{\"Parameters\": { \"Password\": \"${PASSWORD}\", \"Username\": \"${USERNAME}\", \"Identifier\": \"${IDENTIFIER}\"}}" > rds-config.json
                 cat rds-config.json
-#                python update_acl.py $SAM_BUCKET $UNI_S3_ARTF_DR/$UNI_S3_ARTF_NM
-#                aws s3api put-object-acl --bucket $SAM_BUCKET --key $UNI_S3_ARTF_DR/$UNI_S3_ARTF_NM --access-control-policy file://acl.json
-#                jq '.Parameters.BucketName = "s3://unicorn-tooling-accountstack-s9ru91vs16-sambucket-1kz63znob46ht/serverless/unicorn/dev/1573881182815-2019-11-16T05:13:02.815Z/unicorn.zip"' rds-config.json > abc.json && mv abc.json rds-config.json
-#                rm abc.json
 
             - >-
               echo '{"Parameters": {}}' > empty-configuration.json
