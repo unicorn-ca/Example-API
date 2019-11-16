@@ -9,7 +9,7 @@ Parameters:
   SSMPassword:
     Description: Parameter name under which to store the master password for the RDS instance.
     Type: String
-    Default: 'password'
+    Default: '/variables/lambda/password'
   SSMUsername:
     Description: Parameter name under which to store the master username for the RDS instance.
     Type: String
