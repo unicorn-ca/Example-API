@@ -3,12 +3,18 @@ import json, os
 import psycopg2
 import jwt
 import base64
+import boto3
 
-if 'HOST_NAME' in os.environ:
-    host = os.environ['HOST_NAME']
+identifier = ''
+if 'IDENTIFIER' in os.environ:
+    identifier = os.environ['IDENTIFIER']
     database = os.environ['DB_NAME']
     user = os.environ['USERNAME']
     password = os.environ['PASSWORD']
+
+source = boto3.client('rds', region_name='ap-southeast-2')
+instances = source.describe_db_instances(DBInstanceIdentifier=identifier)
+host = instances.get('DBInstances')[0].get('Endpoint').get('Address')
 
 
 def sqli_vulnerable(event, context):

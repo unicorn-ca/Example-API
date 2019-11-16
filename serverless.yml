@@ -21,7 +21,7 @@ custom:
       DB_NAME: /variables/lambda/db_name~true
       PASSWORD: /variables/lambda/password~true
       USERNAME: /variables/lambda/username~true
-      HOST_NAME: /variables/lambda/host_name~true
+      IDENTIFIER: /variables/lambda/identifier~true
 
 functions:
   get_parameter:
