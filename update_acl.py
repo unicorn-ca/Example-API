@@ -1,7 +1,7 @@
 import subprocess
 import json
-import sys, uuid
+import sys, uuid, string, random
 
 if __name__ == "__main__":
-    print(uuid.uuid4().hex)
+    print(random.choice(string.ascii_letters) + uuid.uuid4().hex)
 

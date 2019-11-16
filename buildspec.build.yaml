@@ -44,9 +44,9 @@ phases:
                   echo 'Currently custom deployment buckets cannot be used';
                   exit 1;
               fi
-              PASSWORD="$(python -c 'import uuid; print(uuid.uuid4().hex)')"
-              USERNAME="$(python -c 'import uuid; print(uuid.uuid4().hex)')"
-              IDENTIFIER="$(python -c 'import uuid; print(uuid.uuid4().hex)')"
+              PASSWORD="$(python -c 'import uuid, string, random; print(uuid.uuid4().hex)')"
+              USERNAME="$(python -c 'import uuid, string, random; print(uuid.uuid4().hex)')"
+              IDENTIFIER="$(python -c 'import uuid, string, random; print(random.choice(string.ascii_letters) + uuid.uuid4().hex)')"
 
               aws ssm put-parameter --name "/variables/lambda/username" --value "$USERNAME" --type "SecureString" --overwrite
               aws ssm put-parameter --name "/variables/lambda/password" --value "$PASSWORD" --type "SecureString" --overwrite
