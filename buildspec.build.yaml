@@ -77,5 +77,5 @@ artifacts:
         - sample-transformed.yaml
         - sample-configuration-dev.json
         - sample-configuration-prod.json
-        - template-config-rds.json
+        - template-rds-config.json
         - rds.yml
