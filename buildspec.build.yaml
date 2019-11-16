@@ -17,7 +17,7 @@ phases:
     install:
         runtime-versions:
             nodejs: 10
-            python: 3.6
+            python: 3.7
     pre_build:
         commands:
             - curl -L https://github.com/mikefarah/yq/releases/download/2.4.0/yq_linux_amd64 -o /bin/yq
