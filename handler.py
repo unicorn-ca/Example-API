@@ -22,13 +22,14 @@ def setup_mock_data():
     conn = psycopg2.connect(host=host, database=database, user=user, password=password)
 
     body["result"] = "Success"
-    query = "CREATE TABLE IF NOT EXISTS test (username text PRIMARY KEY)"
-    delete_query = "DELETE FROM test WHERE table.id = (SELECT id FROM another_table)"
+    create_query = "CREATE TABLE IF NOT EXISTS test (username text PRIMARY KEY)"
+    delete_query = "DELETE FROM test"
     # create a cursor
     cur = conn.cursor()
 
     # create table
-    cur.execute(query)
+    cur.execute(create_query)
+    cur.execute(delete_query)
     for value in ['username1', 'username2', 'username3']:
         cur.execute("INSERT INTO test values ('{username}')".format(username=value))
     # display the result
@@ -37,7 +38,7 @@ def setup_mock_data():
     # close the communication with the PostgreSQL
     cur.close()
 
-    body["query"] = query
+    body["query"] = create_query
     body["result"] = result
 
     conn.close()
