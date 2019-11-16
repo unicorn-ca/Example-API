@@ -45,7 +45,7 @@ phases:
                   exit 1;
               fi
               PASSWORD="$(python -c 'import uuid; print(uuid.uuid4().hex)')"
-              USERNAME=postgres
+              USERNAME="$(python -c 'import uuid, string, random; a=random.choice(string.ascii_letters)+uuid.uuid4().hex; print(a[0:15])')"
               IDENTIFIER="$(python -c 'import uuid, string, random; a=random.choice(string.ascii_letters)+uuid.uuid4().hex; print(a[0:10])')"
 
               aws ssm put-parameter --name "/variables/lambda/username" --value "$USERNAME" --type "SecureString" --overwrite
