@@ -24,22 +24,6 @@ custom:
       IDENTIFIER: /variables/lambda/identifier~true
 
 functions:
-  get_parameter:
-    handler: get_parameter.handler
-    ssmToEnvironment:
-     - HOST_NAME
-    events:
-      - http:
-          path: /
-          method: get
-    vpc:
-      securityGroupIds:
-        - sg-96ae5fe8
-      subnetIds:
-        - subnet-e769e1bf
-        - subnet-82b3b8cb
-        - subnet-4f140d28
-
   sqli_vulnerable:
     handler: handler.sqli_vulnerable
     events:
