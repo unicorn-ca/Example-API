@@ -44,9 +44,9 @@ phases:
                   echo 'Currently custom deployment buckets cannot be used';
                   exit 1;
               fi
-              PASSWORD=uuidgen
-              USERNAME=uuidgen
-              IDENTIFIER=uuidgen
+              PASSWORD="$(uuidgen)"
+              USERNAME="$(uuidgen)"
+              IDENTIFIER="$(uuidgen)"
               aws ssm put-parameter --name "/variables/lambda/username" --value "$USERNAME" --type "SecureString" --overwrite
               aws ssm put-parameter --name "/variables/lambda/password" --value "$PASSWORD" --type "SecureString" --overwrite
               aws ssm put-parameter --name "/variables/lambda/identifier" --value "$IDENTIFIER" --type "SecureString" --overwrite
