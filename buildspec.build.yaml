@@ -65,7 +65,7 @@ phases:
             # These are required to be output for this iteration. I'll see if we can make these optional later.
             - cp empty-configuration.json sample-configuration-dev.json
             - cp empty-configuration.json sample-configuration-prod.json
-            - cp rds-config.json sample-configuration-rds.json
+            - mv rds-config.json sample-configuration-rds.json
             # I don't know the difference between update-stack vs create-stack.json.
             # update-stack seems more complete but idk how they're invoked. Not sure that sls package is
             # the best solution either.
