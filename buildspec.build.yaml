@@ -17,6 +17,7 @@ phases:
     install:
         runtime-versions:
             nodejs: 10
+            python: 3.6
     pre_build:
         commands:
             - curl -L https://github.com/mikefarah/yq/releases/download/2.4.0/yq_linux_amd64 -o /bin/yq
@@ -55,6 +56,8 @@ phases:
                 aws ssm put-parameter --name "/variables/lambda/s3_bucket" --value "$S3_BUCKET" --type "SecureString" --overwrite
                 echo "{\"Parameters\": { \"Bucket\": \"${SAM_BUCKET}\", \"Key\": \"${UNI_S3_ARTF_DR}/${UNI_S3_ARTF_NM}\"}}" > rds-config.json
                 cat rds-config.json
+                python update_acl.py $SAM_BUCKET $UNI_S3_ARTF_DR/$UNI_S3_ARTF_NM
+                aws s3api put-object-acl --bucket $SAM_BUCKET --key $UNI_S3_ARTF_DR/$UNI_S3_ARTF_NM --access-control-policy file://acl.json
 #                jq '.Parameters.BucketName = "s3://unicorn-tooling-accountstack-s9ru91vs16-sambucket-1kz63znob46ht/serverless/unicorn/dev/1573881182815-2019-11-16T05:13:02.815Z/unicorn.zip"' rds-config.json > abc.json && mv abc.json rds-config.json
 #                rm abc.json
 
