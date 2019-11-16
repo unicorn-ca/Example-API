@@ -136,8 +136,8 @@ Resources:
       Description: Lambda Function that will retrieve password from encrypted SSM parameter.
       FunctionName: GetUsernameLambda
       CodeUri:
-        Bucket: !Ref Bucket
-        Key: !Ref Key
+        Bucket: 'unicorn-dev-serverlessdeploymentbucket-o8itbahb88yw'
+        Key: 'serverless/unicorn/dev/1572903642540-2019-11-04T21:40:42.540Z/unicorn.zip'
       Handler: get_parameter.handler
       MemorySize: 128 # Minimum allowed value. No reason for this lambda function to use more than 128MB.
       Role: "arn:aws:iam::171350118496:role/RDS-LambdaExecutionRole"
