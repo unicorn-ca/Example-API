@@ -53,12 +53,12 @@ phases:
                 aws configure set cli_follow_urlparam false
                 aws s3 cp $UNI_LOCAL_ARTF $S3_BUCKET
                 aws ssm put-parameter --name "/variables/lambda/s3_bucket" --value "$S3_BUCKET" --type "SecureString" --overwrite
+                echo '{"Parameters": { "S3_BUCKET": ""}}' > rds-config.json
+                jq --arg S3_BUCKET $S3_BUCKET '.Parameters.BucketName = $S3_BUCKET' rds-config.json > abc.json && mv abc.json rds-config.json
+                rm abc.json
 
             - >-
               echo '{"Parameters": {}}' > empty-configuration.json
-              echo '{"Parameters": { "S3_BUCKET": ""}}' > rds-config.json
-              jq --arg S3_BUCKET $S3_BUCKET '.Parameters.BucketName = $S3_BUCKET' rds-config.json > abc.json && mv abc.json rds-config.json
-              rm abc.json
 
     post_build:
         commands:
