@@ -42,10 +42,6 @@ Parameters:
   ReplicaInstanceIdentifier:
     Type: String
     Default: "demo-replica"
-  BucketName:
-    Description: S3 bucket name for Lambda code
-    Type: String
-    Default: 'bucket'
   DBEngine:
     Type: String
     Default: "postgres"
@@ -61,6 +57,14 @@ Parameters:
   DBStorageType:
     Type: String
     Default: "gp2"
+  Key:
+    Description: S3 key name for Lambda code
+    Type: String
+    Default: "key"
+  Bucket:
+    Description: S3 bucket name for Lambda code
+    Type: String
+    Default: "bucket"
   DBAllocatedStorage:
     Type: Number
     Default: 10
@@ -173,7 +177,9 @@ Resources:
     Properties:
       Description: Lambda Function that will retrieve password from encrypted SSM parameter.
       FunctionName: GetUsernameLambda
-      CodeUri: !Ref BucketName
+      CodeUri:
+        Bucket: !Ref Bucket
+        Key: !Ref Key
       Handler: get_parameter.handler
       MemorySize: 128 # Minimum allowed value. No reason for this lambda function to use more than 128MB.
       Role: !GetAtt LambdaExecutionRole.Arn
