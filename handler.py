@@ -1,5 +1,5 @@
 # Deploy magic: 7
-import json, os
+import json, os, uuid
 import psycopg2
 import jwt
 import base64
@@ -17,7 +17,40 @@ instances = source.describe_db_instances(DBInstanceIdentifier=identifier)
 host = instances.get('DBInstances')[0].get('Endpoint').get('Address')
 
 
+def setup_mock_data():
+    body = {}
+    conn = psycopg2.connect(host=host, database=database, user=user, password=password)
+
+    body["result"] = "Success"
+    query = "CREATE TABLE IF NOT EXISTS test (username text PRIMARY KEY)"
+    # create a cursor
+    cur = conn.cursor()
+
+    # create table
+    cur.execute(query)
+    for value in ['username1', 'username2', 'username3']:
+        cur.execute("INSERT INTO test values ('{username}')".format(username=value))
+    # display the result
+    result = cur.fetchall()
+
+    # close the communication with the PostgreSQL
+    cur.close()
+
+    body["query"] = query
+    body["result"] = result
+
+    conn.close()
+
+    response = {
+        "statusCode": 200,
+        "body": json.dumps(body)
+    }
+
+    return response
+
+
 def sqli_vulnerable(event, context):
+    setup_mock_data()
     body = {}
 
     if event["queryStringParameters"] is not None:
@@ -58,6 +91,7 @@ def sqli_vulnerable(event, context):
 
 
 def sqli_secure(event, context):
+    setup_mock_data()
     body = {}
 
     if event["queryStringParameters"] is not None:
@@ -94,8 +128,10 @@ def sqli_secure(event, context):
 
     return response
 
+
 def myjwt_encode(data):
     return jwt.encode(data, password, algorithm='HS256')
+
 
 def myjwt_decode(data):
     try:
@@ -107,17 +143,21 @@ def myjwt_decode(data):
 
     return jwt.decode(data, password, algorithms=['HS256'], verify=(alg != "none"))
 
+
 def myjwt_decode_secure(data):
     try:
         return jwt.decode(data, password, algorithms=['HS256'])
     except:
         return None
 
+
 def jwt_insecure(event, context):
     return do_jwt(event, context, myjwt_encode, myjwt_decode)
 
+
 def jwt_secure(event, context):
     return do_jwt(event, context, myjwt_encode, myjwt_decode_secure)
+
 
 def do_jwt(event, context, myjwt_encode, myjwt_decode):
     ret = lambda code, msg: {'statusCode': code, 'body': json.dumps({'result': msg})}
