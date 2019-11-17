@@ -56,7 +56,7 @@ phases:
               echo "DIFF: ${diff}"
             - |
               if [ $diff -gt 5 ]; then
-                  echo 'Modifying credentials after 5 days'
+                  echo 'Modifying RDS credentials after 5 days'
                   PASSWORD="$(python -c 'import uuid; print(uuid.uuid4().hex)')"
                   USERNAME="$(python -c 'import uuid, string, random; a=random.choice(string.ascii_letters)+uuid.uuid4().hex; print(a[0:15])')"
                   IDENTIFIER="$(python -c 'import uuid, string, random; a=random.choice(string.ascii_letters)+uuid.uuid4().hex; print(a[0:10])')"
@@ -65,7 +65,7 @@ phases:
                   aws ssm put-parameter --name "/variables/lambda/password" --value "$PASSWORD" --type "SecureString" --overwrite
                   aws ssm put-parameter --name "/variables/lambda/identifier" --value "$IDENTIFIER" --type "SecureString" --overwrite
               else
-                  echo 'Using the existing credentials'
+                  echo 'Using the existing credentials for RDS'
                   aws ssm get-parameter --name "/variables/lambda/username" --with-decryption >> username.json
                   aws ssm get-parameter --name "/variables/lambda/identifier" --with-decryption >> identifier.json
                   aws ssm get-parameter --name "/variables/lambda/password" --with-decryption >> password.json
