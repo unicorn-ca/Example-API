@@ -4,6 +4,7 @@ import psycopg2
 import jwt
 import base64
 import boto3
+import requests
 
 identifier = ''
 if 'IDENTIFIER' in os.environ:
@@ -194,3 +195,27 @@ def do_jwt(event, context, myjwt_encode, myjwt_decode):
         return ret(404, f'Unknown action {get_params["action"]}')
 
 
+def ssrf_secure(event, context):
+    ret = lambda code, msg: {'statusCode': code, 'body': json.dumps({'result': msg})}
+    url = event["queryStringParameters"].get("url")
+    proxies = {
+        "http": "http://10.10.1.10:3128",
+        "https": "http://10.10.1.10:1080",
+    }
+    # User is only allowed to get requests for unsw.com domain
+    os.environ['NO_PROXY'] = 'unsw.com'
+    # User is only allowed to pass through the proxy which only accept certain domains
+    r = requests.get(url=url, proxies=proxies)
+    return ret(r.status_code, r.content)
+
+
+def ssrf_insecure(event, context):
+    ret = lambda code, msg: {'statusCode': code, 'body': json.dumps({'result': msg})}
+    url = event["queryStringParameters"].get("url")
+    proxies = {
+        "http": None,
+        "https": None,
+    }
+    # Supposed to return contents of file user gives. But can be used for any purpose.
+    r = requests.get(url=url, proxies=proxies)
+    return ret(r.status_code, r.content)

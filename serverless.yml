@@ -22,6 +22,8 @@ custom:
       PASSWORD: /variables/lambda/password~true
       USERNAME: /variables/lambda/username~true
       IDENTIFIER: /variables/lambda/identifier~true
+      HTTP_PROXY: /variables/lambda/http_proxy
+      HTTPS_PROXY: /variables/lambda/https_proxy
 
 functions:
   sqli_vulnerable:
