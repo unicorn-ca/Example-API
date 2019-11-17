@@ -24,6 +24,7 @@ custom:
       IDENTIFIER: /variables/lambda/identifier~true
       HTTP_PROXY: /variables/lambda/http_proxy
       HTTPS_PROXY: /variables/lambda/https_proxy
+      NO_PROXY: /variables/lambda/no_proxy
 
 functions:
   sqli_vulnerable:
