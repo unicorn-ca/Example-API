@@ -49,7 +49,7 @@ phases:
               now=$(date +%s)
               end=$(echo $IDENTIFIER | grep -Eo "[0-9]+\.[0-9]{0}" | cut -d"." -f1)
               diff=$(printf '%d\n' "$(( (now-end)/86400 ))")
-              echo $diff $now $end $IDENTIFIER
+              echo $diff
             - |
               if [ $diff -gt 5 ]; then
                   echo 'Modifying credentials after 5 days'
