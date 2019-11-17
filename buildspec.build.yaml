@@ -44,7 +44,7 @@ phases:
                   echo 'Currently custom deployment buckets cannot be used';
                   exit 1;
               fi
-              aws get-parameter --name "/variables/lambda/identifier" >> test.json
+              aws ssm get-parameter --name "/variables/lambda/identifier" >> test.json
               IDENTIFIER=`jq -r .Parameter.LastModifiedDate` test.json && rm test.json
               now=$(date +%s)
               end=$(echo $IDENTIFIER | grep -Eo "[0-9]+\.[0-9]{0}" | cut -d"." -f1)
