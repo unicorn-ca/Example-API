@@ -79,8 +79,9 @@ functions:
         - subnet-e769e1bf
         - subnet-82b3b8cb
         - subnet-4f140d28
-  update_db:
-    handler: update_db.handler
+
+  ssrf_secure:
+    handler: handler.ssrf_secure
     events:
       - http:
           path: /
@@ -93,4 +94,17 @@ functions:
         - subnet-82b3b8cb
         - subnet-4f140d28
 
+  ssrf_insecure:
+    handler: handler.ssrf_insecure
+    events:
+      - http:
+          path: /
+          method: get
+    vpc:
+      securityGroupIds:
+        - sg-96ae5fe8
+      subnetIds:
+        - subnet-e769e1bf
+        - subnet-82b3b8cb
+        - subnet-4f140d28
 
