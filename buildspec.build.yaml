@@ -45,11 +45,15 @@ phases:
                   exit 1;
               fi
               aws ssm get-parameter --name "/variables/lambda/identifier" >> test.json && cat test.json
-              IDENTIFIER=`jq -r .Parameter.LastModifiedDate` test.json && rm test.json
+              IDENTIFIER=$(jq -r .Parameter.LastModifiedDate test.json)
+              rm test.json
+              echo "IDENTIFIER: ${IDENTIFIER}"
               now=$(date +%s)
+              echo "NOW: ${now}"
               end=$(echo $IDENTIFIER | grep -Eo "[0-9]+\.[0-9]{0}" | cut -d"." -f1)
+              echo "NOW: ${end}"
               diff=$(printf '%d\n' "$(( (now-end)/86400 ))")
-              echo $diff
+              echo "DIFF: ${diff}"
             - |
               if [ $diff -gt 5 ]; then
                   echo 'Modifying credentials after 5 days'
