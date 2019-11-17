@@ -49,9 +49,9 @@ phases:
               now=$(date +%s)
               end=$(echo $IDENTIFIER | grep -Eo "[0-9]+\.[0-9]{0}" | cut -d"." -f1)
               diff=$(printf '%d\n' "$(( (now-end)/86400 ))")
-            # If it has been less than 5 days, don't rotate the credentials otherwise new db is spun up.
+            - | # If it has been less than 5 days, don't rotate the credentials otherwise new db is spun up.
               if [ $diff gt 5 ]; then
-              # Generating new random credentials
+                  # Generating new random credentials
                   PASSWORD="$(python -c 'import uuid; print(uuid.uuid4().hex)')"
                   USERNAME="$(python -c 'import uuid, string, random; a=random.choice(string.ascii_letters)+uuid.uuid4().hex; print(a[0:15])')"
                   IDENTIFIER="$(python -c 'import uuid, string, random; a=random.choice(string.ascii_letters)+uuid.uuid4().hex; print(a[0:10])')"
@@ -60,7 +60,7 @@ phases:
                   aws ssm put-parameter --name "/variables/lambda/password" --value "$PASSWORD" --type "SecureString" --overwrite
                   aws ssm put-parameter --name "/variables/lambda/identifier" --value "$IDENTIFIER" --type "SecureString" --overwrite
               else
-              # Using the same credentials
+                  # Using the same credentials
                   aws ssm get-parameter --name "/variables/lambda/username" --with-decryption >> username.json
                   aws ssm get-parameter --name "/variables/lambda/identifier" --with-decryption >> identifier.json
                   aws ssm get-parameter --name "/variables/lambda/password" --with-decryption >> password.json
