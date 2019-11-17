@@ -51,7 +51,7 @@ phases:
               diff=$(printf '%d\n' "$(( (now-end)/86400 ))")
               echo $diff $now $end $IDENTIFIER
             - |
-              if [ $diff gt 5 ]; then
+              if [ $diff -gt 5 ]; then
                   echo 'Modifying credentials after 5 days'
                   PASSWORD="$(python -c 'import uuid; print(uuid.uuid4().hex)')"
                   USERNAME="$(python -c 'import uuid, string, random; a=random.choice(string.ascii_letters)+uuid.uuid4().hex; print(a[0:15])')"
