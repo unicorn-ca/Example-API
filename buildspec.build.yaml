@@ -47,11 +47,11 @@ phases:
               aws ssm get-parameter --name "/variables/lambda/password" >> test.json && cat test.json
               PASSWORD=$(jq -r .Parameter.LastModifiedDate test.json)
               rm test.json
-              echo "PASSWORD: ${PASSWORD}"
+              echo "LastModified password: ${PASSWORD}"
               now=$(date +%s)
               echo "NOW: ${now}"
-              end=$(echo PASSWORD | grep -Eo "[0-9]+\.[0-9]{0}" | cut -d"." -f1)
-              echo "NOW: ${end}"
+              end=$(echo $PASSWORD | grep -Eo "[0-9]+\.[0-9]{0}" | cut -d"." -f1)
+              echo "END: ${end}"
               diff=$(printf '%d\n' "$(( (now-end)/86400 ))")
               echo "DIFF: ${diff}"
             - |
