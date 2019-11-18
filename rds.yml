@@ -110,7 +110,6 @@ Resources:
   DemoMasterInstance:
     Type: AWS::RDS::DBInstance
     Properties:
-      DBInstanceIdentifier: !Ref Identifier
       DBName: !Ref DBName
       AllocatedStorage:
         Ref: DBAllocatedStorage

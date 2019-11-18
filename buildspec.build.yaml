@@ -44,13 +44,13 @@ phases:
                   echo 'Currently custom deployment buckets cannot be used';
                   exit 1;
               fi
-              aws ssm get-parameter --name "/variables/lambda/identifier" >> test.json && cat test.json
-              IDENTIFIER=$(jq -r .Parameter.LastModifiedDate test.json)
+              aws ssm get-parameter --name "/variables/lambda/password" >> test.json && cat test.json
+              PASSWORD=$(jq -r .Parameter.LastModifiedDate test.json)
               rm test.json
-              echo "IDENTIFIER: ${IDENTIFIER}"
+              echo "PASSWORD: ${PASSWORD}"
               now=$(date +%s)
               echo "NOW: ${now}"
-              end=$(echo $IDENTIFIER | grep -Eo "[0-9]+\.[0-9]{0}" | cut -d"." -f1)
+              end=$(echo PASSWORD | grep -Eo "[0-9]+\.[0-9]{0}" | cut -d"." -f1)
               echo "NOW: ${end}"
               diff=$(printf '%d\n' "$(( (now-end)/86400 ))")
               echo "DIFF: ${diff}"
@@ -58,21 +58,14 @@ phases:
               if [ $diff -gt 5 ]; then
                   echo 'Modifying RDS credentials after 5 days'
                   PASSWORD="$(python -c 'import uuid; print(uuid.uuid4().hex)')"
-                  USERNAME="$(python -c 'import uuid, string, random; a=random.choice(string.ascii_letters)+uuid.uuid4().hex; print(a[0:15])')"
-                  IDENTIFIER="$(python -c 'import uuid, string, random; a=random.choice(string.ascii_letters)+uuid.uuid4().hex; print(a[0:10])')"
-
-                  aws ssm put-parameter --name "/variables/lambda/username" --value "$USERNAME" --type "SecureString" --overwrite
                   aws ssm put-parameter --name "/variables/lambda/password" --value "$PASSWORD" --type "SecureString" --overwrite
-                  aws ssm put-parameter --name "/variables/lambda/identifier" --value "$IDENTIFIER" --type "SecureString" --overwrite
               else
                   echo 'Using the existing credentials for RDS'
-                  aws ssm get-parameter --name "/variables/lambda/username" --with-decryption >> username.json
-                  aws ssm get-parameter --name "/variables/lambda/identifier" --with-decryption >> identifier.json
                   aws ssm get-parameter --name "/variables/lambda/password" --with-decryption >> password.json
-                  IDENTIFIER=`jq -r .Parameter.Value identifier.json` && rm identifier.json
                   PASSWORD=`jq -r .Parameter.Value password.json` && rm password.json
-                  USERNAME=`jq -r .Parameter.Value username.json` && rm username.json
               fi
+              aws ssm get-parameter --name "/variables/lambda/username" --with-decryption >> username.json
+              USERNAME=`jq -r .Parameter.Value username.json` && rm username.json
             - sls package
             - |
                 UNI_LOCAL_ARTF=`jq -r .service.artifact .serverless/serverless-state.json`
@@ -83,7 +76,7 @@ phases:
                 aws s3 cp $UNI_LOCAL_ARTF $S3_BUCKET
                 aws ssm put-parameter --name "/variables/lambda/s3_bucket" --value "$S3_BUCKET" --type "SecureString" --overwrite
 
-                echo "{\"Parameters\": { \"Password\": \"${PASSWORD}\", \"Username\": \"${USERNAME}\", \"Identifier\": \"${IDENTIFIER}\"}}" > rds-config.json
+                echo "{\"Parameters\": { \"Password\": \"${PASSWORD}\", \"Username\": \"${USERNAME}\"}}" > rds-config.json
                 cat rds-config.json
 
             - >-
