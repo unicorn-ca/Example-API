@@ -62,7 +62,7 @@ phases:
               else
                   echo 'Using the existing credentials for RDS'
                   aws ssm get-parameter --name "/variables/lambda/password" --with-decryption >> password.json
-                  PASSWORD=`jq -r .Parameter.Value password.json` && rm password.json
+                  PASSWORD="$(python -c 'import uuid; print(uuid.uuid4().hex)')"
               fi
               aws ssm get-parameter --name "/variables/lambda/username" --with-decryption >> username.json
               USERNAME=`jq -r .Parameter.Value username.json` && rm username.json
