@@ -55,15 +55,9 @@ phases:
               diff=$(printf '%d\n' "$(( (now-end)/86400 ))")
               echo "DIFF: ${diff}"
             - |
-              if [ $diff -gt 5 ]; then
-                  echo 'Modifying RDS credentials after 5 days'
-                  PASSWORD="$(python -c 'import uuid; print(uuid.uuid4().hex)')"
-                  aws ssm put-parameter --name "/variables/lambda/password" --value "$PASSWORD" --type "SecureString" --overwrite
-              else
-                  echo 'Using the existing credentials for RDS'
-                  aws ssm get-parameter --name "/variables/lambda/password" --with-decryption >> password.json
-                  PASSWORD="$(python -c 'import uuid; print(uuid.uuid4().hex)')"
-              fi
+              echo 'Modifying RDS credentials after 5 days'
+              PASSWORD="$(python -c 'import uuid; print(uuid.uuid4().hex)')"
+              aws ssm put-parameter --name "/variables/lambda/password" --value "$PASSWORD" --type "SecureString" --overwrite
               aws ssm get-parameter --name "/variables/lambda/username" --with-decryption >> username.json
               USERNAME=`jq -r .Parameter.Value username.json` && rm username.json
             - sls package
