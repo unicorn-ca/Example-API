@@ -14,6 +14,7 @@ if 'IDENTIFIER' in os.environ:
     password = os.environ['PASSWORD']
 
 print('Fetch RDS hostname')
+print(os.environ['AWS_SECRET_ACCESS_KEY'], os.environ['AWS_ACCESS_KEY_ID'])
 source = boto3.client('rds', region_name='ap-southeast-2')
 instances = source.describe_db_instances(DBInstanceIdentifier=identifier)
 host = instances.get('DBInstances')[0].get('Endpoint').get('Address')
