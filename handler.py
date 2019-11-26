@@ -13,9 +13,11 @@ if 'IDENTIFIER' in os.environ:
     user = os.environ['USERNAME']
     password = os.environ['PASSWORD']
 
+print('Fetch RDS hostname')
 source = boto3.client('rds', region_name='ap-southeast-2')
 instances = source.describe_db_instances(DBInstanceIdentifier=identifier)
 host = instances.get('DBInstances')[0].get('Endpoint').get('Address')
+print(host)
 
 
 def setup_mock_data():
