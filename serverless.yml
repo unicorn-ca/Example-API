@@ -25,6 +25,8 @@ custom:
       HTTP_PROXY: /variables/lambda/http_proxy
       HTTPS_PROXY: /variables/lambda/https_proxy
       NO_PROXY: /variables/lambda/no_proxy
+      AWS_ACCESS_KEY_ID: /lambda/variable/aws_secret_key_dev
+      AWS_SECRET_ACCESS_KEY: /lambda/variables/aws_key_dev
 
 functions:
   sqli_vulnerable:

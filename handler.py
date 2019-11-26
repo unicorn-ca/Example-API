@@ -36,6 +36,7 @@ def setup_mock_data():
     for value in ['username1', 'username2', 'username3']:
         cur.execute("INSERT INTO test values ('{username}')".format(username=value))
     # display the result
+    conn.commit()
     result = cur.fetchall()
 
     # close the communication with the PostgreSQL
