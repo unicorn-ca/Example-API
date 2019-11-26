@@ -7,21 +7,15 @@ import boto3
 import requests
 
 identifier = ''
-if 'IDENTIFIER' in os.environ:
-    identifier = os.environ['IDENTIFIER']
+if 'HOST' in os.environ:
+    host = os.environ['HOST']
     database = os.environ['DB_NAME']
     user = os.environ['USERNAME']
     password = os.environ['PASSWORD']
 
-print('Fetch RDS hostname')
-print(os.environ['AWS_SECRET_ACCESS_KEY'], os.environ['AWS_ACCESS_KEY_ID'])
-source = boto3.client('rds', region_name='ap-southeast-2')
-instances = source.describe_db_instances(DBInstanceIdentifier=identifier)
-host = instances.get('DBInstances')[0].get('Endpoint').get('Address')
-print(host)
-
 
 def setup_mock_data():
+    print(host)
     body = {}
     conn = psycopg2.connect(host=host, database=database, user=user, password=password)
 
