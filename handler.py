@@ -30,24 +30,16 @@ def setup_mock_data():
     cur.execute(delete_query)
     for value in ['username1', 'username2', 'username3']:
         cur.execute("INSERT INTO test values ('{username}')".format(username=value))
-    # display the result
+
     conn.commit()
-    result = cur.fetchall()
-
-    # close the communication with the PostgreSQL
-    cur.close()
-
-    body["query"] = create_query
-    body["result"] = result
-
     conn.close()
 
     response = {
         "statusCode": 200,
-        "body": json.dumps(body)
+        "Message": "Data Creation successful"
     }
 
-    return response
+    print(response)
 
 
 def sqli_vulnerable(event, context):
