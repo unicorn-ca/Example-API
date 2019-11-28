@@ -1,4 +1,4 @@
-# Deploy magic: 7
+# Deploy magic: 8
 import json, os, uuid
 import psycopg2
 import jwt
