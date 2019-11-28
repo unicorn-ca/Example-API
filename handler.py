@@ -100,7 +100,7 @@ def sqli_secure(event, context):
         cur = conn.cursor()
 
         # execute a statement
-        cur.execute("SELECT * FROM test WHERE username='%s'", (vulnString,))
+        cur.execute("SELECT * FROM test WHERE username=%s", (vulnString,))
 
         # display the result
         result = cur.fetchall()
