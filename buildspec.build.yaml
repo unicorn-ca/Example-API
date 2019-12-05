@@ -27,6 +27,7 @@ phases:
             - npm install serverless-ssm-fetch
             - npm install serverless-deployment-bucket --save-dev
     build:
+        commands:
             # We override servlerless's default functionality by pointing its deployment at a custom bucket embedded in 
             # the pipeline. 
             #  First we check that there isn't a deploymentBucket specified, if there is we error 
