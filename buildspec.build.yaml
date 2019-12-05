@@ -28,36 +28,60 @@ phases:
             - npm install serverless-deployment-bucket --save-dev
     build:
         commands:
-            # We override servlerless's default functionality by pointing its deployment at a custom bucket embedded in 
-            # the pipeline. 
-            #  First we check that there isn't a deploymentBucket specified, if there is we error 
-            #    otherwise we point it at the SAM bucket 
-            # 
-            #  Finding a better way of generically handling this (so its equally easy to deploy with serverless 
-            #   vs SAM vs Raw Cloudformation) is a priority for the next iteration 
-            # 
-            - | 
-              if [ `yq r serverless.yml provider.deploymentBucket.name` = 'null' ]; then 
-                  echo "No deployment bucket found - using $SAM_BUCKET"; 
-                  yq w --inplace serverless.yml provider.deploymentBucket.name $SAM_BUCKET; 
-              else 
-                  echo 'Currently custom deployment buckets cannot be used'; 
-                  exit 1; 
-              fi 
-            - sls package 
-            - | 
-                UNI_LOCAL_ARTF=`jq -r .service.artifact .serverless/serverless-state.json` 
-                UNI_S3_ARTF_DR=`jq -r .package.artifactDirectoryName .serverless/serverless-state.json` 
-                UNI_S3_ARTF_NM=`jq -r .package.artifact .serverless/serverless-state.json` 
-                aws s3 cp $UNI_LOCAL_ARTF s3://$SAM_BUCKET/$UNI_S3_ARTF_DR/$UNI_S3_ARTF_NM 
-            - >- 
-              echo '{"Parameters": {}}' > empty-configuration.json 
+            # We override servlerless's default functionality by pointing its deployment at a custom bucket embedded in
+            # the pipeline.
+            #  First we check that there isn't a deploymentBucket specified, if there is we error
+            #    otherwise we point it at the SAM bucket
+            #
+            #  Finding a better way of generically handling this (so its equally easy to deploy with serverless
+            #   vs SAM vs Raw Cloudformation) is a priority for the next iteration
+            #
+            - |
+              if [ `yq r serverless.yml provider.deploymentBucket.name` = 'null' ]; then
+                  echo "No deployment bucket found - using $SAM_BUCKET";
+                  yq w --inplace serverless.yml provider.deploymentBucket.name $SAM_BUCKET;
+              else
+                  echo 'Currently custom deployment buckets cannot be used';
+                  exit 1;
+              fi
+              aws ssm get-parameter --name "/variables/lambda/password" >> test.json && cat test.json
+              PASSWORD=$(jq -r .Parameter.LastModifiedDate test.json)
+              rm test.json
+              echo "LastModified password: ${PASSWORD}"
+              now=$(date +%s)
+              echo "NOW: ${now}"
+              end=$(echo $PASSWORD | grep -Eo "[0-9]+\.[0-9]{0}" | cut -d"." -f1)
+              echo "END: ${end}"
+              diff=$(printf '%d\n' "$(( (now-end)/86400 ))")
+              echo "DIFF: ${diff}"
+            - |
+              echo 'Modifying RDS credentials after 5 days'
+              PASSWORD="$(python -c 'import uuid; print(uuid.uuid4().hex)')"
+              aws ssm put-parameter --name "/variables/lambda/password" --value "$PASSWORD" --type "SecureString" --overwrite
+              aws ssm get-parameter --name "/variables/lambda/username" --with-decryption >> username.json
+              USERNAME=`jq -r .Parameter.Value username.json` && rm username.json
+            - sls package
+            - |
+                UNI_LOCAL_ARTF=`jq -r .service.artifact .serverless/serverless-state.json`
+                UNI_S3_ARTF_DR=`jq -r .package.artifactDirectoryName .serverless/serverless-state.json`
+                UNI_S3_ARTF_NM=`jq -r .package.artifact .serverless/serverless-state.json`
+                S3_BUCKET=s3://$SAM_BUCKET/$UNI_S3_ARTF_DR/$UNI_S3_ARTF_NM
+                aws configure set cli_follow_urlparam false
+                aws s3 cp $UNI_LOCAL_ARTF $S3_BUCKET
+                aws ssm put-parameter --name "/variables/lambda/s3_bucket" --value "$S3_BUCKET" --type "SecureString" --overwrite
+
+                echo "{\"Parameters\": { \"Password\": \"${PASSWORD}\", \"Username\": \"${USERNAME}\"}}" > rds-config.json
+                cat rds-config.json
+
+            - >-
+              echo '{"Parameters": {}}' > empty-configuration.json
 
     post_build:
         commands:
             # These are required to be output for this iteration. I'll see if we can make these optional later.
             - cp empty-configuration.json sample-configuration-dev.json
             - cp empty-configuration.json sample-configuration-prod.json
+            - mv rds-config.json sample-configuration-rds.json
             # I don't know the difference between update-stack vs create-stack.json.
             # update-stack seems more complete but idk how they're invoked. Not sure that sls package is
             # the best solution either.
@@ -68,3 +92,5 @@ artifacts:
         - sample-transformed.yaml
         - sample-configuration-dev.json
         - sample-configuration-prod.json
+        - sample-configuration-rds.json
+        - rds.yml
