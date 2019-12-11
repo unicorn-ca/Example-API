@@ -1,17 +1,49 @@
 # Deploy magic: 8
-import json, os
+import json, os, uuid
 import psycopg2
 import jwt
 import base64
+import boto3
+import requests
 
-if 'HOST_NAME' in os.environ:
-    host = os.environ['HOST_NAME']
+identifier = ''
+if 'HOST' in os.environ:
+    host = os.environ['HOST']
     database = os.environ['DB_NAME']
     user = os.environ['USERNAME']
     password = os.environ['PASSWORD']
 
 
+def setup_mock_data():
+    print(host)
+    body = {}
+    conn = psycopg2.connect(host=host, database=database, user=user, password=password)
+
+    body["result"] = "Success"
+    create_query = "CREATE TABLE IF NOT EXISTS test (username text PRIMARY KEY)"
+    delete_query = "DELETE FROM test"
+    # create a cursor
+    cur = conn.cursor()
+
+    # create table
+    cur.execute(create_query)
+    cur.execute(delete_query)
+    for value in ['username1', 'username2', 'username3']:
+        cur.execute("INSERT INTO test values ('{username}')".format(username=value))
+
+    conn.commit()
+    conn.close()
+
+    response = {
+        "statusCode": 200,
+        "Message": "Data Creation successful"
+    }
+
+    print(response)
+
+
 def sqli_vulnerable(event, context):
+    setup_mock_data()
     body = {}
 
     if event["queryStringParameters"] is not None:
@@ -52,6 +84,7 @@ def sqli_vulnerable(event, context):
 
 
 def sqli_secure(event, context):
+    setup_mock_data()
     body = {}
 
     if event["queryStringParameters"] is not None:
@@ -67,7 +100,7 @@ def sqli_secure(event, context):
         cur = conn.cursor()
 
         # execute a statement
-        cur.execute("SELECT * FROM test WHERE username='%s'", (vulnString,))
+        cur.execute("SELECT * FROM test WHERE username=%s", (vulnString,))
 
         # display the result
         result = cur.fetchall()
@@ -88,8 +121,10 @@ def sqli_secure(event, context):
 
     return response
 
+
 def myjwt_encode(data):
     return jwt.encode(data, password, algorithm='HS256')
+
 
 def myjwt_decode(data):
     try:
@@ -101,17 +136,21 @@ def myjwt_decode(data):
 
     return jwt.decode(data, password, algorithms=['HS256'], verify=(alg != "none"))
 
+
 def myjwt_decode_secure(data):
     try:
         return jwt.decode(data, password, algorithms=['HS256'])
     except:
         return None
 
+
 def jwt_insecure(event, context):
     return do_jwt(event, context, myjwt_encode, myjwt_decode)
 
+
 def jwt_secure(event, context):
     return do_jwt(event, context, myjwt_encode, myjwt_decode_secure)
+
 
 def do_jwt(event, context, myjwt_encode, myjwt_decode):
     ret = lambda code, msg: {'statusCode': code, 'body': json.dumps({'result': msg})}
@@ -146,3 +185,27 @@ def do_jwt(event, context, myjwt_encode, myjwt_decode):
         return ret(404, f'Unknown action {get_params["action"]}')
 
 
+def ssrf_secure(event, context):
+    ret = lambda code, msg: {'statusCode': code, 'body': json.dumps({'result': msg})}
+    url = event["queryStringParameters"].get("url")
+    proxies = {
+        "http": "http://10.10.1.10:3128",
+        "https": "http://10.10.1.10:1080",
+    }
+    # User is only allowed to get requests for unsw.com domain
+    os.environ['NO_PROXY'] = 'unsw.com'
+    # User is only allowed to pass through the proxy which only accept certain domains
+    r = requests.get(url=url, proxies=proxies)
+    return ret(r.status_code, r.content)
+
+
+def ssrf_insecure(event, context):
+    ret = lambda code, msg: {'statusCode': code, 'body': json.dumps({'result': msg})}
+    url = event["queryStringParameters"].get("url")
+    proxies = {
+        "http": None,
+        "https": None,
+    }
+    # Supposed to return contents of file user gives. But can be used for any purpose.
+    r = requests.get(url=url, proxies=proxies)
+    return ret(r.status_code, r.content)
